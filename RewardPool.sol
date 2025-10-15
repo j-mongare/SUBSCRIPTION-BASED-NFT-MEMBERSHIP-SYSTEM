@@ -61,8 +61,8 @@ contract RewardPool is ReentrancyGuard, Pausable {
         poolBalance -= reward;
         rewardsClaimed[msg.sender] += reward;
 
-        //@ notice....for economic and safety reasons, it would be better if we let users withdraw for themselves (pull payment)
-        // in this scenario I have pushed the rewards to the users, which can be expensive in users are many.
+        //@ notice....for economic and safety(reentrancy) reasons, it would be better if we let users withdraw for themselves (pull payment)
+        // in this scenario I have pushed the rewards to the users, which can be expensive if users are many.
 
         bool success = rewardToken.transfer(msg.sender, reward);
         if (!success) revert TransferFailed();
@@ -92,4 +92,5 @@ contract RewardPool is ReentrancyGuard, Pausable {
         admin = newAdmin;
     }
 }
+
 
