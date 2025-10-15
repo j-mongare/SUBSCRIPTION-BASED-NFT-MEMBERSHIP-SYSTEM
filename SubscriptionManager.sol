@@ -70,8 +70,9 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
         // @notice user must first call approve On IERC20.sol before subscribing. That is,
       // token. approve(msg.sender, address(this), amount);.......
 
-        token.transferFrom(msg.sender, address(this), t.price);
         totalCollected += t.price;
+        token.transferFrom(msg.sender, address(this), t.price);
+       
          
         MT.mintMembership(msg.sender, uint8(tierId)); 
           uint256 expiryTime = block.timestamp + t.duration ;
@@ -88,10 +89,11 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
         MembershipToken.MemberData memory m = MT.getMemberData(tokenId);
 
         TierRegistry.Tier memory t = registry.getTier(m.tier); // get NFT tier info
-      
-       token.transferFrom(msg.sender, address(this), t.price);
-       totalCollected += t.price;
 
+       totalCollected += t.price;
+       token.transferFrom(msg.sender, address(this), t.price);
+
+    // update expiry time
        expiry[msg.sender]+= t.duration;
 
        emit Renewed(msg.sender, tokenId, expiry[msg.sender] );
@@ -102,7 +104,8 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
         return (block.timestamp < expiry[user]);
            
         }
-        function cancelMembership(uint256 tokenId, address user) external onlyAdmin{
+
+    function cancelMembership(uint256 tokenId, address user) external onlyAdmin{
            MT.revokeMembership(tokenId);
            expiry[user]=0;
 
@@ -152,3 +155,4 @@ _unPause();
 
 
  
+
