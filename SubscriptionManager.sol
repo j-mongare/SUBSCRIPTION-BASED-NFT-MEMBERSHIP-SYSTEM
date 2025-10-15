@@ -15,17 +15,17 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
 
     ///===============state/storage=========
 
-    IERC20 public token; // token used to pay( eg ETH, DAI)
+    IERC20 public token;               // token used to pay( eg ETH, DAI)
 
-    MembershipToken public  MT; //  NFT contract reference
+    MembershipToken public  MT;       //  NFT contract reference
 
-    TierRegistry public registry; // where pricing info is fetched
+    TierRegistry public registry;     // where pricing info is fetched
 
     mapping(address => uint256) public expiry; // tracks subscription end to timestamps
 
-    address public immutable admin; // system operator 
+    address public immutable admin;  // system operator 
 
-    uint256 public totalCollected; // records total funds collected
+    uint256 public totalCollected;  // records total funds collected
 
     //===========EVENTS============================
 
@@ -61,12 +61,15 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
     //=========Behavioral Logic============
 
     //@notice this allows any user to buy a membership
-    function subscribe(uint256 tierId) external whenNotPaused nonReentrant {
+
+    function subscribe(uint256 tierId) external whenNotPaused nonReentrant  {
+
         TierRegistry.Tier memory t = registry.getTier(tierId);
         if(t.price==0 || t.duration==0) revert TransactionFailed(); 
 
-        // @notice user must first call approve On  the ERC20 before subscribing
-      // token. approve(msg.sender, address(this), amount);
+        // @notice user must first call approve On IERC20.sol before subscribing. That is,
+      // token. approve(msg.sender, address(this), amount);.......
+
         token.transferFrom(msg.sender, address(this), t.price);
         totalCollected += t.price;
          
@@ -77,14 +80,14 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
 
         emit Subscribed(msg.sender, tierId, expiryTime);
 
-        
-
-
     }
    // @notice extends a memebership duration for existing members
-    function renew (uint256 tokenId) external nonReentrant whenNotPaused{
+
+    function renew (uint256 tokenId) external nonReentrant whenNotPaused {
+
         MembershipToken.MemberData memory m = MT.getMemberData(tokenId);
-      TierRegistry.Tier memory t = registry.getTier(m.tier); // get NFT tier info
+
+        TierRegistry.Tier memory t = registry.getTier(m.tier); // get NFT tier info
       
        token.transferFrom(msg.sender, address(this), t.price);
        totalCollected += t.price;
@@ -100,36 +103,52 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
            
         }
         function cancelMembership(uint256 tokenId, address user) external onlyAdmin{
-    MT.revokeMembership(tokenId);
-    expiry[user]=0;
+           MT.revokeMembership(tokenId);
+           expiry[user]=0;
 
-    emit MembershipCancelled(user);
-    }
-function withdrawFunds()external onlyAdmin{
+            emit MembershipCancelled(user);
+    } 
 
- uint256 amount = token. balanceOf(address (this));
+    function withdrawFunds()external onlyAdmin whenNotPaused nonReentrant {
 
- if(amount==0)revert InsufficientFunds();
- totalCollected = 0 ;
+          uint256 amount = token. balanceOf(address (this));
 
- (bool sent )= token. transfer(admin, amount);
- if(!sent) revert TransactionFailed();
+          if(amount==0)revert InsufficientFunds();
+           totalCollected = 0 ;
 
-  emit FundsWithdrawn(admin, amount);
+          (bool sent )= token. transfer(admin, amount);
+          if(!sent) revert TransactionFailed();
+
+           emit FundsWithdrawn(admin, amount);
  
 
  }
- function setTierRegistry(address newRegistry)external onlyAdmin {
-    if(newRegistry== address(0)) revert InvalidAddress();
-    registry = TierRegistry(newRegistry);
+//==========helper functions==================
 
-    emit RegistryChanged(newRegistry);
+    function setTierRegistry(address newRegistry)external onlyAdmin {
+       if(newRegistry== address(0)) revert InvalidAddress();
+       registry = TierRegistry(newRegistry);
+
+       emit RegistryChanged(newRegistry);
+  
+ }
+   function setAdmin(address newAdmin) external onlyAdmin{ 
+    if (newAdmin== address(0)) revert InvalidAddress();
+    admin= newAdmin;
+ }
+
+function pause() external onlyAdmin whenNotPaused{
+_pause();
+
+}
+
+function unPause() external onlyAdmin whenPaused{
+_unPause();
+
+}
+}
+ 
  
 
- 
- }
- }
- 
- 
 
  
