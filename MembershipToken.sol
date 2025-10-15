@@ -64,7 +64,7 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
             id: tokenId,
             tier: tier,
             active: true,
-            joinDate: uint64(block.timestamp)
+            joinDate: uint256 (block.timestamp)
         });
 
         emit MembershipMinted(to, tokenId, tier);
@@ -99,7 +99,8 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
         
     }
 
-    /// @notice Prevents transfers — only mint (from=0) and burn (to=0) are allowed
+    /// @notice Prevents transfers — only mint (from = address(0)), and burn (to = address(0)) are allowed
+
     function _update(address to, uint256 tokenId, address auth)
         internal
         override
@@ -108,25 +109,33 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
     {
         address from = _ownerOf(tokenId);
         if (from != address(0) && to != address(0)) revert NotTransferable();
+
         return super._update(to, tokenId, auth);
     }
 
     // ======== VIEW HELPERS ==========
+
     function getMemberData(uint256 tokenId) external view returns (MemberData memory) {
         return members[tokenId];
     }
+
     //@dev supportsInterface is part of ERC165, which is how smart contracts declare which interfaces (like ERC721, ERC2981, etc.) they implement.
-//@notice When multiple parents implement it, you must merge them manually to keep things unambiguous.
+    //@notice When multiple parents implement it, you must merge them manually to keep things unambiguous.
     
     function supportsInterface(bytes4 interfaceId)public view override (ERC721, AccessControl) returns (bool){
         return super.supportsInterface(interfaceId);
     }
+
     function setAdmin(address newAdmin) external onlyRole(DEFAULT_ADMIN_ROLE){
         if (newAdmin == address(0)) revert InvalidAddress();
         admin= newAdmin;
+
     }
+
     function setManager(address newManager) external onlyRole(DEFAULT_ADMIN_ROLE){
         if(newManager== address(0))revert InvalidAddress();
       _grantRole(MINTER_ROLE, newManager);
+
     }
 }
+
