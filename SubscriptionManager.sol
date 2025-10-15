@@ -23,7 +23,7 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
 
     mapping(address => uint256) public expiry; // tracks subscription end to timestamps
 
-    address public immutable admin;  // system operator 
+    address public  admin;  // system operator 
 
     uint256 public totalCollected;  // records total funds collected
 
@@ -47,8 +47,8 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v5.0
     constructor (address _token, address _MT, address payable _registry, address _admin ){
         token = IERC20(_token);
         MT = MembershipToken(_MT);
-        registry= TierRegistry(_registry);
-        admin= _admin;
+        registry = TierRegistry(_registry);
+        admin = _admin;
 
         emit ContractInitialized();
 
@@ -155,4 +155,5 @@ _unPause();
 
 
  
+
 
