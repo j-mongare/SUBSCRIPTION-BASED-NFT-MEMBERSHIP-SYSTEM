@@ -36,15 +36,19 @@ contract RewardPool is ReentrancyGuard, Pausable {
 
     function depositRewards(uint256 amount) external onlyAdmin whenNotPaused nonReentrant {
         if (amount == 0) revert InsufficientFunds();
+         poolBalance += amount;
+
         bool success = rewardToken.transferFrom(admin, address(this), amount);
         if (!success) revert TransferFailed();
-        poolBalance += amount;
+       
         emit RewardsDeposited(amount);
     }
 
     function calculateReward(address user) internal view returns (uint256) {
         // Example placeholder: fixed reward
-        return poolBalance / 100; // 1% of remaining pool
+       // 1% of remaining pool
+
+       return poolBalance / 100; 
     }
 
     function claimRewards() external whenNotPaused nonReentrant {
@@ -56,6 +60,9 @@ contract RewardPool is ReentrancyGuard, Pausable {
 
         poolBalance -= reward;
         rewardsClaimed[msg.sender] += reward;
+
+        //@ notice....for economic and safety reasons, it would be better if we let users withdraw for themselves (pull payment)
+        // in this scenario I have pushed the rewards to the users, which can be expensive in users are many.
 
         bool success = rewardToken.transfer(msg.sender, reward);
         if (!success) revert TransferFailed();
@@ -85,3 +92,4 @@ contract RewardPool is ReentrancyGuard, Pausable {
         admin = newAdmin;
     }
 }
+
