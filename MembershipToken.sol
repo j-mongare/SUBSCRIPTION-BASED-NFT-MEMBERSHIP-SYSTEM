@@ -41,7 +41,8 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
 
     // ======== CONSTRUCTOR ==========
     constructor(address _admin, address _manager) ERC721("MembershipToken", "MT") {
-        if (_admin == address(0)) revert InvalidAddress();
+        if (_admin == address(0) && _manager == address (0)) revert InvalidAddress();
+         
         admin = _admin;
         manager=_manager;
 
@@ -139,5 +140,6 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
 
     }
 }
+
 
 
