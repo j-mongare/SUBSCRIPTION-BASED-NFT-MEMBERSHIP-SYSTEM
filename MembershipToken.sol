@@ -28,7 +28,7 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
     address public manager;
 
     // ======== EVENTS ==========
-    event MembershipMinted(address indexed to, uint256 indexed tokenId, uint256 tier);
+    event MembershipMinted(address indexed from, address indexed to, uint256 indexed tokenId, uint256 tier);
     event MembershipRevoked(uint256 indexed tokenId);
     event TierUpgraded(uint256 indexed tokenId, uint256 indexed newTier);
     event ContractInitialized();
@@ -66,8 +66,9 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
             active: true,
             joinDate: uint256 (block.timestamp)
         });
+         address from = address(0);
 
-        emit MembershipMinted(to, tokenId, tier);
+        emit MembershipMinted(from, to, tokenId, tier);
     }
 
     function revokeMembership(uint256 tokenId) external whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -138,4 +139,5 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
 
     }
 }
+
 
