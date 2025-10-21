@@ -67,9 +67,9 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
             active: true,
             joinDate: uint256 (block.timestamp)
         });
-         address from = address(0);
+        
 
-        emit MembershipMinted(from, to, tokenId, tier);
+        emit MembershipMinted(address(0), to, tokenId, tier);
     }
 
     function revokeMembership(uint256 tokenId) external whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -140,6 +140,7 @@ contract MembershipToken is ERC721, AccessControl, Pausable {
 
     }
 }
+
 
 
 
